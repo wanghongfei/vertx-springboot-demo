@@ -1,0 +1,15 @@
+vertx:
+  server:
+    port: 8080
+
+  handler-mappings:
+    -
+      path: /home
+      method: GET
+      beanName: homeHandler
+
+    -
+      path: /demo
+      method: GET
+      beanName: demoHandler
+
