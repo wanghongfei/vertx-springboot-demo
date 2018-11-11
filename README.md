@@ -10,3 +10,56 @@
 
 vertx通过使用`BootEventListener`事件监听器将自身的启动逻辑嵌入到Spring生命周期中，vertx相关配置可通过`application.yaml`传入。
 
+
+
+一个需要发起两次blocking调用的请求处理代码示例：
+
+```java
+@Component
+@Slf4j
+public class DemoHandler implements Handler<RoutingContext> {
+    @Autowired
+    private DemoService demoService;
+
+    @Override
+    public void handle(RoutingContext route) {
+        log.info(route.request().path());
+
+        Future<String> fut1 = Future.future();
+        Future<String> fut2 = Future.future();
+
+        // 执行block调用
+        route.vertx()
+                .executeBlocking(
+                        fut -> {
+                            String result = demoService.blockingLogic(1);
+                            fut.complete(result);
+                        },
+                        fut1.completer()
+                );
+
+        // 执行block调用
+        route.vertx()
+                .executeBlocking(
+                        fut -> {
+                            String result = demoService.blockingLogic(2);
+                            fut.complete(result);
+                        },
+                        fut2.completer()
+                );
+
+        // 组合结果
+        CompositeFuture.all(fut1, fut2).setHandler(ar -> {
+            if (!ar.succeeded()) {
+                log.error("", ar.cause());
+                route.response().end("error");
+                return;
+            }
+
+            List<String> resultList = ar.result().list();
+            route.response().end(resultList.toString());
+        });
+    }
+}
+```
+
