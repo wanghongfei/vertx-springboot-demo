@@ -9,6 +9,6 @@ public class HomeHandler implements Handler<RoutingContext> {
     @Override
     public void handle(RoutingContext route) {
         route.response()
-                .end("OK");
+                .end(route.request().path());
     }
 }
