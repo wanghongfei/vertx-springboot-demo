@@ -3,15 +3,11 @@ vertx:
     port: 8080
 
   handler-mappings:
-    - path: /home
-      method: GET
-      beanName: homeHandler
-
     - path: /demo
       method: GET
-      beanName: demoHandler
+      beanNames: homeHandler,demoHandler
 
     - path: /block
       method: GET
-      beanName: blockedCallHandler
+      beanNames: blockedCallHandler
 

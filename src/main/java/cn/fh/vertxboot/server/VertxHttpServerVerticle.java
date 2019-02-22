@@ -30,13 +30,16 @@ public class VertxHttpServerVerticle extends AbstractVerticle {
 
     private void addHandlers(Router router, List<VertxProps.HandlerMapping> handlerMappings) {
         for (VertxProps.HandlerMapping hm : handlerMappings) {
-            Handler<RoutingContext> handler = (Handler<RoutingContext>) springContext.getBean(hm.getBeanName());
+            for (String beanName : hm.getBeanNames()) {
+                Handler<RoutingContext> handler = (Handler<RoutingContext>) springContext.getBean(beanName);
 
-            Route route = router.route(hm.getPath());
-            if (isBlocked(handler)) {
-                route.blockingHandler(handler);
-            } else {
-                route.handler(handler);
+                Route route = router.route(hm.getPath());
+                if (isBlocked(handler)) {
+                    route.blockingHandler(handler);
+                } else {
+                    route.handler(handler);
+                }
+
             }
         }
     }

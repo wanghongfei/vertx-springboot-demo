@@ -19,7 +19,7 @@ public class DemoHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(RoutingContext route) {
-        log.info(route.request().path());
+        log.info("invoke DemoHandler, path: {}", route.request().path());
 
         Future<String> fut1 = Future.future();
         Future<String> fut2 = Future.future();

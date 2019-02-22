@@ -39,9 +39,11 @@ public class BootEventListener implements ApplicationListener<ApplicationStarted
      */
     private void logMappings(ApplicationContext ctx, List<VertxProps.HandlerMapping> mappings) {
         for (VertxProps.HandlerMapping hm : mappings) {
-            log.info("mapping {} {} to {}", hm.getMethod(), hm.getPath(),
-                    ctx.getBean(hm.getBeanName()).getClass().getName()
-            );
+            for (String beanName : hm.getBeanNames()) {
+                log.info("mapping {} {} to {}", hm.getMethod(), hm.getPath(),
+                        ctx.getBean(beanName).getClass().getName()
+                );
+            }
         }
 
     }

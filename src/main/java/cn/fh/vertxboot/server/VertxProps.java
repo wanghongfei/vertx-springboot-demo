@@ -33,7 +33,7 @@ public class VertxProps {
         /**
          * 对应Spring里的bean名
          */
-        private String beanName;
+        private List<String> beanNames;
     }
 
     @Data
