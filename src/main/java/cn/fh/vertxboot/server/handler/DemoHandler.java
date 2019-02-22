@@ -24,6 +24,10 @@ public class DemoHandler implements Handler<RoutingContext> {
         Future<String> fut1 = Future.future();
         Future<String> fut2 = Future.future();
 
+//        vertx().createHttpClient().get("url", ar -> {
+//            // 回调方法
+//        });
+
         // 执行block调用
         route.vertx()
                 .executeBlocking(

@@ -1,8 +1,10 @@
 package cn.fh.vertxboot.server;
 
+import cn.fh.vertxboot.server.meta.BlockedHandler;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
+import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +32,17 @@ public class VertxHttpServerVerticle extends AbstractVerticle {
         for (VertxProps.HandlerMapping hm : handlerMappings) {
             Handler<RoutingContext> handler = (Handler<RoutingContext>) springContext.getBean(hm.getBeanName());
 
-            router.route(hm.getPath())
-                    .handler(handler);
+            Route route = router.route(hm.getPath());
+            if (isBlocked(handler)) {
+                route.blockingHandler(handler);
+            } else {
+                route.handler(handler);
+            }
         }
+    }
+
+    private boolean isBlocked(Handler<?> handler) {
+        BlockedHandler an = handler.getClass().getAnnotation(BlockedHandler.class);
+        return an != null;
     }
 }
