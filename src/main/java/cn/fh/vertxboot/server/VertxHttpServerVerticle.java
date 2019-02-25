@@ -2,6 +2,7 @@ package cn.fh.vertxboot.server;
 
 import cn.fh.vertxboot.server.meta.BlockedHandler;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Route;
@@ -17,7 +18,7 @@ public class VertxHttpServerVerticle extends AbstractVerticle {
     public static ApplicationContext springContext;
 
     @Override
-    public void start() {
+    public void start(Future<Void> startFuture) {
         VertxProps config = springContext.getBean(VertxProps.class);
 
         HttpServer server = vertx.createHttpServer();
@@ -25,7 +26,14 @@ public class VertxHttpServerVerticle extends AbstractVerticle {
         addHandlers(router, config.getHandlerMappings());
 
         server.requestHandler(router::accept)
-                .listen(config.getServer().getPort());
+                .listen(config.getServer().getPort(), res -> {
+                    if (res.succeeded()) {
+                        startFuture.complete();
+
+                    } else {
+                        startFuture.fail(res.cause());
+                    }
+                });
     }
 
     private void addHandlers(Router router, List<VertxProps.HandlerMapping> handlerMappings) {
