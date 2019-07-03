@@ -21,21 +21,18 @@ public class DemoHandler implements Handler<RoutingContext> {
     public void handle(RoutingContext route) {
         log.info("invoke DemoHandler, path: {}", route.request().path());
 
+        // (0)
         Future<String> fut1 = Future.future();
         Future<String> fut2 = Future.future();
 
-//        vertx().createHttpClient().get("url", ar -> {
-//            // 回调方法
-//        });
-
         // 执行block调用
-        route.vertx()
+        route.vertx() // (1)
                 .executeBlocking(
                         fut -> {
-                            String result = demoService.blockingLogic(1);
-                            fut.complete(result);
+                            String result = demoService.blockingLogic(1); // (3)
+                            fut.complete(result); // (4)
                         },
-                        fut1.completer()
+                        fut1.completer()  // (5)
                 );
 
         // 执行block调用
@@ -49,14 +46,16 @@ public class DemoHandler implements Handler<RoutingContext> {
                 );
 
         // 组合结果
-        CompositeFuture.all(fut1, fut2).setHandler(ar -> {
+        CompositeFuture.all(fut1, fut2).setHandler(ar -> { // (6)
             if (!ar.succeeded()) {
                 log.error("", ar.cause());
                 route.response().end("error");
                 return;
             }
 
-            List<String> resultList = ar.result().list();
+            log.info("final step");
+
+            List<String> resultList = ar.result().list(); // (7)
             route.response().end(resultList.toString());
         });
     }

@@ -1,6 +1,6 @@
 vertx:
   server:
-    port: 8080
+    port: 80
 
   handler-mappings:
     - path: /demo
@@ -11,3 +11,10 @@ vertx:
       method: GET
       beanNames: blockedCallHandler
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8761/eureka/
+    registry-fetch-interval-seconds: 20
+  instance:
+    prefer-ip-address: true
